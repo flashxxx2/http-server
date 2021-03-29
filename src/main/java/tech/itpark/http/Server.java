@@ -93,20 +93,6 @@ public class Server {
 
         postRequest(in, out, buffer, CRLF, requestLineEndIndex, headersEndIndex);
 
-        // TODO: find handler & call it
-
-        // TODO: HttpRequest ->
-        // 1. Method -> GET/POST | getHeader
-        // 2. Uri (path/query) | getUri
-        // 3. Version | getVersion
-        // 4. Headers | get
-        // 5. Body []byte
-
-        // TODO: HttpResponse
-        // 1. StatusCode | setStatusCode
-        // 2. StatusText - OK | setStatusText
-        // 3. Headers - | setHeader()
-        // 4. Body []byte - |
       } catch (MalFormedRequestException e) {
         e.printStackTrace();
       }
@@ -116,15 +102,14 @@ public class Server {
   }
 
   private void getRequest(BufferedOutputStream out, String ok) throws IOException {
-    final var body = ok;
     out.write(
             (
                     "HTTP/1.1 200 OK\r\n" +
                             "Content-Type: text/plain\r\n" +
-                            "Content-Length: " + body.length() + "\r\n" +
+                            "Content-Length: " + ok.length() + "\r\n" +
                             "Connection: close\r\n" +
                             "\r\n" +
-                            body
+                            ok
             ).getBytes());
   }
 
