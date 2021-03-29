@@ -1,0 +1,12 @@
+###
+
+GET http://localhost:9999/path HTTP/1.1
+
+###
+
+POST http://localhost:9999/path
+Content-Type: application/json
+
+{
+  "id": 0
+}
