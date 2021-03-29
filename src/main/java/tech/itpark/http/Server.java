@@ -42,14 +42,11 @@ public class Server {
         final var out = new BufferedOutputStream(socket.getOutputStream());
     ) {
       try {
-        final var buffer = new byte[4096]; // request line - headers < 4Кб
+        final var buffer = new byte[4096];
         in.mark(4096);
 
-        // Content-Length | GET -> фиговый
         final var read = in.read(buffer);
         final var CRLF = new byte[]{'\r', '\n'};
-
-        // mark + reset + markSupported
 
         final var requestLineEndIndex = Bytes.indexOf(buffer, CRLF, 0, read) + CRLF.length;
         if (requestLineEndIndex == -1) {
@@ -81,8 +78,6 @@ public class Server {
         }
 
         if (method.equals(GET)) {
-          // TODO: в будущем вычитать все header
-          // TODO: вызывать обработчик
 
           getRequest(out, "OK");
           return;
