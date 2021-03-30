@@ -2,6 +2,8 @@ package tech.itpark.http;
 
 import tech.itpark.http.exception.*;
 import tech.itpark.http.guava.Bytes;
+import tech.itpark.http.model.HttpRequest;
+import tech.itpark.http.model.HttpResponse;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -17,6 +20,19 @@ public class Server {
   public static final String POST = "POST";
   public static final Set<String> allowedMethods = Set.of(GET, POST);
   public static final Set<String> supportedHTTPVersions = Set.of("HTTP/1.1");
+  private String getPath;
+  public Listener<HttpRequest, HttpResponse> getHandle;
+  public Listener<HttpRequest, HttpResponse> postHandle;
+
+  public void get(String path, Listener<HttpRequest, HttpResponse> getListener) {
+    getPath = path;
+    getHandle = getListener;
+  }
+
+  public void post(String path, Listener<HttpRequest, HttpResponse> postListener) {
+    getPath = path;
+    postHandle = postListener;
+  }
 
   public void listen(int port) {
     try (
@@ -77,8 +93,11 @@ public class Server {
           throw new InvalidVersionException("invalid version: " + version);
         }
 
-        if (method.equals(GET)) {
-
+        if (method.equals(GET) && getHandle != null) {
+          if(uri.equals(getPath)) {
+            getHandle.run(new HttpRequest("путь", "хедер", "body", "1.1", Collections.singletonList("headers")),
+                    new HttpResponse("text", 200, "body", Collections.singletonList("headers")));
+          }
           getRequest(out, "OK");
           return;
         }
@@ -86,6 +105,9 @@ public class Server {
         final var CRLFCRLF = new byte[]{'\r', '\n', '\r', '\n'};
         final var headersEndIndex = Bytes.indexOf(buffer, CRLFCRLF, requestLineEndIndex, read) + CRLFCRLF.length;
 
+        if(getHandle != null && uri.equals(getPath)) {
+          getHandle.run(null,null);
+        }
         postRequest(in, out, buffer, CRLF, requestLineEndIndex, headersEndIndex);
 
       } catch (MalFormedRequestException e) {
