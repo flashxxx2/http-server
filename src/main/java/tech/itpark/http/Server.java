@@ -95,20 +95,21 @@ public class Server {
 
         if (method.equals(GET) && getHandle != null) {
           if(uri.equals(getPath)) {
-            getHandle.run(new HttpRequest("путь", "хедер", "body", "1.1", Collections.singletonList("headers")),
+            getHandle.run(new HttpRequest(uri, "хедер", "body", version, Collections.singletonList("headers")),
                     new HttpResponse("text", 200, "body", Collections.singletonList("headers")));
           }
-          getRequest(out, "OK");
+//          getRequest(out, "OK");
           return;
         }
 
         final var CRLFCRLF = new byte[]{'\r', '\n', '\r', '\n'};
         final var headersEndIndex = Bytes.indexOf(buffer, CRLFCRLF, requestLineEndIndex, read) + CRLFCRLF.length;
 
-        if(getHandle != null && uri.equals(getPath)) {
-          getHandle.run(null,null);
+        if(postHandle != null && uri.equals(getPath)) {
+          postHandle.run(new HttpRequest(uri, "хедер", "body", version, Collections.singletonList("headers")),
+                  new HttpResponse("text", 200, "body", Collections.singletonList("headers")));
         }
-        postRequest(in, out, buffer, CRLF, requestLineEndIndex, headersEndIndex);
+//        postRequest(in, out, buffer, CRLF, requestLineEndIndex, headersEndIndex);
 
       } catch (MalFormedRequestException e) {
         e.printStackTrace();

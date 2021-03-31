@@ -1,7 +1,5 @@
 package tech.itpark.http;
 
-import java.util.Arrays;
-
 public class Main {
     public static void main(String[] args) {
         final var server = new Server();
